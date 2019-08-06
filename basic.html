@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <nav>nav</nav>
+    <header class="bg-dark text-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col text-center p-4">
+                        <h1>Smart Baby Care System</h1>
+                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rem totam velit repellat odit consequuntur quam amet voluptatibus illum voluptate quisquam!</p>
+                        <button class="btn btn-outline-primary">Button</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="p-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-5", style = "padding-left : 0">
+                        <img src="https://www.pbcexpo.com.au/assets/Exhibitor-logos/10114/_resampled/CroppedFocusedImageWzEyMDAsNjMwLCJ5IiwyMl0/ScaleWidthWyI0MDAiXQ/iStock-511813000-1555x875.jpg"></img>
+                    </div>
+                    <div class="col-lg-7 align-self-center">
+                        <h3>Explore & Conccect</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Necessitatibus eaque dignissimos minima ad autem delectus! Illo similique doloremque odit libero nam omnis aliquid voluptatum quisquam eum officia, odio neque expedita?</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <div class="row">
+                    <ul class="col list-group", style = "padding-right : 0">
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- <section class="p-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 bg-primary p-5">
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Harum, perferendis!
+                    </div>
+                    <div class="col-lg-4 bg-danger p-5">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt, dolorem perspiciatis.
+                    </div>
+                    <div class="col-lg-4 bg-warning p-5">
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Culpa dolor consectetur nostrum!
+                    </div>
+                </div>
+            </div>
+        </section> -->
+
+        <section class="pt-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 align-self-center py-3">
+                        <h3>Explore&Connect</h3>
+                        <div class="input-group">
+                            <input type="text" class="form-control", placeholder="Data">
+                            <button class="input-group-append btn btn-dark">register</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 px-5">
+                        <canvas width="500" height="400" id="myLineChart"></canvas>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>footer</footer>
+
+        <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous">
+        </script>
+
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+
+        <script>
+
+            getData("/sensor/led01/values/1", {}, function(data){
+                console.log("data", parseData(data))
+                drawList(parseData(data));
+                drawLineChart(parseData(data));
+            });
+
+            //$.ajax().done().fail()
+            //ajax를 이용하여 서버에서 data 받기 위한 함수 getData 기본 구조
+            //data : 통신데이터가 data 변수에 자동 저장됨
+            function getData(uri, data, fun){
+                $.ajax({
+                    url : "http://localhost:5000" + uri,
+                    method : "GET",
+                    data : JSON.stringify(data),
+                    dataType : "json",
+                    contentType : "application/json"
+                }).done(function (returnData) {
+                    if(fun) {
+                        fun(returnData);
+                    }
+                }).fail(function() {
+                    console.log("fail getData");
+
+                    //실패했을 때 할 일은 필요없으므로 주석처리
+                    // if(fun){
+                    //     fun();
+                    // }
+                }).always(function() {
+
+                });
+            };
+
+            //서버로부터 받은 데이터에서 "value" key 값만 parsing
+            function parseData(serverData){
+                var dataList = [];
+                for (var data of serverData.values) {
+                    dataList.push(data.value)
+                    //dataList.push(data.datetime)
+                }
+
+                return dataList
+            }
+
+            function drawList(chartData){
+                var list = document.querySelector(".list-group");
+                while(list.firstChild) {
+                    list.removeChild(list.firstChild);
+                }
+
+                for(var item of chartData){
+                    //$(list).append(`<li class="list-group-item">${item}</li>`);
+                    $(list).append('<li class="list-group-item">' + item + '</li>');
+                }
+            }
+
+            function drawLineChart(chartData){
+               //DOM 추출 - <id = 'myLineChart'>
+                var lineCanvas = document.querySelector("#myLineChart");
+                new Chart(
+                    lineCanvas,{
+                        type : 'line',
+                        data : {
+                            labels: chartData,
+                            datasets : [{
+                                label : 'lineChart',
+                                data : chartData,
+                                backgroundColor : 'rgba(255, 99, 132, 1)'
+                            }]
+                        }
+                    }
+                );
+            }
+
+        </script>
+
+</body>
+</html>
